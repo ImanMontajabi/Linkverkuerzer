@@ -11,7 +11,7 @@ import (
 config := LoadConfig()
 
 // Connect to database
-ConnectDatabae()
+ConnectDatabase()
 MigrateDatabase()
 
 func main() {
@@ -40,5 +40,5 @@ func main() {
 	}))
 
 	// URL Handler
-	urlHandler := NewURLHandler(config)
+	//urlHandler := NewURLHandler(config)
 }
