@@ -1,6 +1,18 @@
 package main
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/recover"
+)
+
+// Load config
+config := LoadConfig()
+
+// Connect to database
+ConnectDatabae()
+MigrateDatabase()
 
 func main() {
 	// Fiber app
@@ -18,5 +30,15 @@ func main() {
 		AppName: "Linkverkuerzer v1.0.0",
 	})
 	// Middleware
+	app.Use(recover.New())
+	app.Use(logger.New(logger.Config{
+		Format: "${time} | ${status} | ${latency} | ${method} | ${path}\n",
+	}))
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "*",
+		AllowMethods: "GET,POST,HEAD,PUT,DELETE,PATCH,OPTIONS",
+	}))
 
+	// URL Handler
+	urlHandler := NewURLHandler(config)
 }
