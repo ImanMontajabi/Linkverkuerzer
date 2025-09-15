@@ -7,14 +7,13 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 )
 
-// Load config
-config := LoadConfig()
-
-// Connect to database
-ConnectDatabase()
-MigrateDatabase()
-
 func main() {
+	// Load config
+	config := LoadConfig()
+
+	// Connect to database
+	ConnectDatabase()
+	MigrateDatabase()
 	// Fiber app
 	app := fiber.New(fiber.Config{
 		ErrorHandler: func(ctx *fiber.Ctx, err error) error {
@@ -37,8 +36,9 @@ func main() {
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
 		AllowMethods: "GET,POST,HEAD,PUT,DELETE,PATCH,OPTIONS",
+		AllowHeaders: "Origin,Content-Type,Accept,Authorization",
 	}))
 
 	// URL Handler
-	//urlHandler := NewURLHandler(config)
+	urlHandler := NewURLHandler(config)
 }
