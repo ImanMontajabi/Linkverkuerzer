@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -12,8 +14,18 @@ func main() {
 	config := LoadConfig()
 
 	// Connect to database
-	ConnectDatabase()
+	ConnectDatabase(config)
 	MigrateDatabase()
+
+	// Initialize repository
+	urlRepo := NewURLRepository(DB)
+
+	// Initialize service
+	urlService := NewURLService(urlRepo, config)
+
+	// Initialize handler
+	urlHandler := NewURLHandler(urlService, config)
+
 	// Fiber app
 	app := fiber.New(fiber.Config{
 		ErrorHandler: func(ctx *fiber.Ctx, err error) error {
@@ -21,13 +33,14 @@ func main() {
 			if e, ok := err.(*fiber.Error); ok {
 				code = e.Code
 			}
-			return ctx.Status(code).JSON(fiber.Map{
-				"error":   err.Error(),
-				"success": false,
+			return ctx.Status(code).JSON(ErrorResponse{
+				Error:   err.Error(),
+				Success: false,
 			})
 		},
 		AppName: "Linkverkuerzer v1.0.0",
 	})
+
 	// Middleware
 	app.Use(recover.New())
 	app.Use(logger.New(logger.Config{
@@ -39,14 +52,14 @@ func main() {
 		AllowHeaders: "Origin,Content-Type,Accept,Authorization",
 	}))
 
-	// URL Handler
-	urlHandler := NewURLHandler(config)
-
-	// Routes
-	// sequences are important
+	// Routes (order is important)
 	app.Get("/", urlHandler.HealthCheck)
 	app.Post("/shorten", urlHandler.ShortenUrl)
 	app.Get("/stats/:code", urlHandler.GetStats)
 	app.Get("/urls", urlHandler.GetAllUrls)
 	app.Get("/:code", urlHandler.RedirectUrl)
+
+	// Start server
+	log.Printf("Server starting on port %s", config.Port)
+	log.Fatal(app.Listen(":" + config.Port))
 }

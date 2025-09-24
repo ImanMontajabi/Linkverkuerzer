@@ -32,3 +32,19 @@ type StatsResponse struct {
 	ClickCount  int       `json:"click_count"`
 	CreatedAt   time.Time `json:"created_at"`
 }
+
+type URLListResponse struct {
+	URLs  []URL `json:"urls"`
+	Total int   `json:"total"`
+}
+
+type ErrorResponse struct {
+	Error   string `json:"error"`
+	Success bool   `json:"success"`
+}
+
+type SuccessResponse struct {
+	Message string      `json:"message"`
+	Data    interface{} `json:"data,omitempty"`
+	Success bool        `json:"success"`
+}
