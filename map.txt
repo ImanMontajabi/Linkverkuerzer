@@ -1,0 +1,6 @@
+handlers.go → HTTP requests/responses
+service.go  → Business logic
+models.go   → Data structures
+utils.go    → Helper functions
+database.go → Database connections
+config.go   → Configuration

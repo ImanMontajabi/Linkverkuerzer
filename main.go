@@ -41,4 +41,12 @@ func main() {
 
 	// URL Handler
 	urlHandler := NewURLHandler(config)
+
+	// Routes
+	// sequences are important
+	app.Get("/", urlHandler.HealthCheck)
+	app.Post("/shorten", urlHandler.ShortenUrl)
+	app.Get("/stats/:code", urlHandler.GetStats)
+	app.Get("/urls", urlHandler.GetAllUrls)
+	app.Get("/:code", urlHandler.RedirectUrl)
 }
